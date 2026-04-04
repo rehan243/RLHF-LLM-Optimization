@@ -85,49 +85,6 @@ Developed at **Reallytics.ai** for production GenAI products requiring reliable,
 | **Infrastructure** | CUDA, Multi-GPU, Docker |
 | **Experiment Tracking** | Weights & Biases, TensorBoard |
 
-## Project Structure
-
-```
-rlhf-llm-optimization/
-├── configs/
-│   ├── sft_config.yaml
-│   ├── reward_model_config.yaml
-│   └── ppo_config.yaml
-├── data/
-│   ├── prepare_sft_data.py
-│   ├── prepare_preference_data.py
-│   └── human_feedback_schema.py
-├── sft/
-│   ├── train_sft.py
-│   └── sft_utils.py
-├── reward_model/
-│   ├── train_reward_model.py
-│   ├── reward_model.py
-│   └── preference_dataset.py
-├── ppo/
-│   ├── train_ppo.py
-│   ├── ppo_trainer_config.py
-│   └── kl_controller.py
-├── evaluation/
-│   ├── evaluate_alignment.py
-│   ├── safety_benchmark.py
-│   └── quality_metrics.py
-├── serving/
-│   ├── export_model.py
-│   └── vllm_deploy.py
-├── infrastructure/
-│   ├── Dockerfile
-│   ├── deepspeed_config.json
-│   └── docker-compose.yml
-├── notebooks/
-│   ├── 01_sft_training.ipynb
-│   ├── 02_reward_modeling.ipynb
-│   └── 03_ppo_training.ipynb
-├── tests/
-├── requirements.txt
-└── README.md
-```
-
 ## Training Results
 
 | Stage | Metric | Value |
@@ -139,26 +96,10 @@ rlhf-llm-optimization/
 | Final | Helpfulness (human eval) | +35% vs base |
 | Final | Safety compliance | 96% |
 
-## Quick Start
+---
 
-```bash
-git clone https://github.com/rehan243/RLHF-LLM-Optimization.git
-cd RLHF-LLM-Optimization
+> **Source Code**: The production source code for this project is maintained in a private repository due to proprietary and client confidentiality requirements. This repository documents the architecture, design decisions, and technical approach. For code-level discussions or collaboration inquiries, feel free to reach out.
 
-pip install -r requirements.txt
-
-# Phase 1: Supervised Fine-Tuning
-python sft/train_sft.py --config configs/sft_config.yaml
-
-# Phase 2: Train Reward Model
-python reward_model/train_reward_model.py --config configs/reward_model_config.yaml
-
-# Phase 3: PPO Optimization
-python ppo/train_ppo.py --config configs/ppo_config.yaml
-
-# Export aligned model
-python serving/export_model.py --checkpoint ./output/ppo_final
-```
 
 ## Author
 
@@ -169,4 +110,3 @@ python serving/export_model.py --checkpoint ./output/ppo_final
 - [Email](mailto:rehanmalil99@gmail.com)
 
 ---
-
