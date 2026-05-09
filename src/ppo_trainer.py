@@ -1,4 +1,4 @@
-"""Thin TRL wrapper — KL schedules and reward shaping live here so the notebook stays readable."""
+"""thin trl wrapper — kl schedules and reward shaping live here so the notebook stays readable."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ class PPOConfig:
 
 
 class PPOTrainerWrapper:
-    """We don't reimplement PPO — we babysit TRL's trainer and log the drama."""
+    """we don't reimplement ppo — we babysit trl's trainer and log the drama."""
 
     def __init__(
         self,
@@ -46,7 +46,7 @@ class PPOTrainerWrapper:
         return self.config.kl_coef * (0.5 * (1 + math.cos(math.pi * progress))) + self.config.kl_target
 
     def reset_reward_baseline(self) -> None:
-        """Call between curriculum stages so old rollouts don't poison the baseline."""
+        """call between curriculum stages so old rollouts don't poison the baseline."""
         self._reward_hist.clear()
 
     def shape_rewards(self, rewards: torch.Tensor | np.ndarray) -> torch.Tensor:
@@ -66,13 +66,13 @@ class PPOTrainerWrapper:
             try:
                 self.inner.kl_ctl.value = new_kl
                 return
-            except Exception:
-                logger.debug("could not set kl_ctl.value — TRL version mismatch?")
+            except Exception as e:
+                logger.debug(f"could not set kl_ctl.value — {e}")
         if hasattr(self.inner, "config") and hasattr(self.inner.config, "kl_coef"):
             try:
                 self.inner.config.kl_coef = new_kl
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"could not set inner config kl_coef — {e}")
 
     def step_postprocess(self, stats: dict[str, Any]) -> dict[str, float]:
         self._step += 1
@@ -103,7 +103,7 @@ class PPOTrainerWrapper:
         return out
 
     def aggregate_rollout_metrics(self, rewards: np.ndarray, advantages: Optional[np.ndarray] = None) -> dict[str, float]:
-        """Optional hook if you bypass TRL stats dict and log raw numpy from env."""
+        """optional hook if you bypass trl stats dict and log raw numpy from env."""
         m: dict[str, float] = {
             "ppo/raw_reward_mean": float(np.mean(rewards)),
             "ppo/raw_reward_std": float(np.std(rewards)),
@@ -118,7 +118,7 @@ class PPOTrainerWrapper:
         return max(1, aligned)
 
     def attach_trl_callbacks(self) -> None:
-        """If your TRL version supports callbacks, register them here — placeholder for glue code."""
+        """if your trl version supports callbacks, register them here — placeholder for glue code."""
         cb = getattr(self.inner, "callbacks", None)
         if cb is None:
             logger.info("inner trainer has no callbacks list — skipping attach_trl_callbacks")
