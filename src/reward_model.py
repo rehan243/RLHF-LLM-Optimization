@@ -1,11 +1,11 @@
-"""Scalar head on a frozen-ish LM — learns what 'better' means from pairwise labels."""
+"""scalar head on a frozen-ish lm — learns what 'better' means from pairwise labels."""
 
 from __future__ import annotations
 
 import logging
 import math
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 import torch
 import torch.nn as nn
@@ -27,13 +27,14 @@ def _pool_last_hidden(
     hidden: torch.Tensor,
     attention_mask: torch.Tensor,
 ) -> torch.Tensor:
+    """pool last hidden states based on attention mask"""
     mask = attention_mask.unsqueeze(-1)
     summed = (hidden * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1e-6)
     return summed
 
 
 class RewardModel(nn.Module):
-    """Bradley-Terry on pooled encoder states. Checkpointing keeps 7B-ish models from OOM-ing."""
+    """bradley-terry on pooled encoder states, checkpointing keeps 7B-ish models from oom-ing"""
 
     def __init__(
         self,
@@ -55,7 +56,7 @@ class RewardModel(nn.Module):
         )
         hidden = int(getattr(self.backbone.config, "hidden_size", 0) or getattr(self.backbone.config, "d_model", 0))
         if hidden <= 0:
-            raise ValueError(f"Cannot infer hidden size from {type(self.backbone.config)}")
+            raise ValueError(f"cannot infer hidden size from {type(self.backbone.config)}")
 
         self.score_head = nn.Sequential(
             nn.LayerNorm(hidden),
@@ -71,12 +72,13 @@ class RewardModel(nn.Module):
                 for layer in layer_list[:freeze_backbone_layers]:
                     for p in layer.parameters():
                         p.requires_grad = False
-                logger.info("Froze first %s transformer blocks", freeze_backbone_layers)
+                logger.info("froze first %s transformer blocks", freeze_backbone_layers)
 
         if use_gradient_checkpointing:
             self.backbone.gradient_checkpointing_enable()
 
     def encode(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        """encode inputs to get rewards"""
         out = self.backbone(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -87,9 +89,11 @@ class RewardModel(nn.Module):
         return self.score_head(pooled.float()).squeeze(-1)
 
     def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        """forward pass through the model"""
         return self.encode(input_ids, attention_mask)
 
     def bradley_terry_loss(self, batch: PreferenceBatch) -> torch.Tensor:
+        """calculate the bradley-terry loss"""
         r_chosen = self.forward(batch.chosen_input_ids, batch.chosen_attention_mask)
         r_rejected = self.forward(batch.rejected_input_ids, batch.rejected_attention_mask)
         logits = r_chosen - r_rejected
@@ -98,10 +102,11 @@ class RewardModel(nn.Module):
     @torch.inference_mode()
     def predict_reward(
         self,
-        texts: list[str],
+        texts: List[str],
         max_length: int = 512,
         device: Optional[torch.device] = None,
     ) -> torch.Tensor:
+        """predict rewards for a list of texts"""
         device = device or next(self.backbone.parameters()).device
         enc = self.tokenizer(
             texts,
@@ -114,6 +119,7 @@ class RewardModel(nn.Module):
         return self.forward(enc["input_ids"], enc["attention_mask"])
 
     def training_step(self, batch: PreferenceBatch) -> dict[str, float]:
+        """perform a training step and return metrics"""
         self.train()
         r_chosen = self.forward(batch.chosen_input_ids, batch.chosen_attention_mask)
         r_rejected = self.forward(batch.rejected_input_ids, batch.rejected_attention_mask)
