@@ -49,11 +49,16 @@ class RewardModel(nn.Module):
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        self.backbone: PreTrainedModel = AutoModel.from_pretrained(
-            backbone_name,
-            torch_dtype=torch_dtype,
-            trust_remote_code=True,
-        )
+        try:
+            self.backbone: PreTrainedModel = AutoModel.from_pretrained(
+                backbone_name,
+                torch_dtype=torch_dtype,
+                trust_remote_code=True,
+            )
+        except Exception as e:
+            logger.error(f"Error loading model: {e}")
+            raise RuntimeError("could not load model")
+
         hidden = int(getattr(self.backbone.config, "hidden_size", 0) or getattr(self.backbone.config, "d_model", 0))
         if hidden <= 0:
             raise ValueError(f"cannot infer hidden size from {type(self.backbone.config)}")
