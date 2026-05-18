@@ -1,4 +1,4 @@
-"""DPO when you can't afford online rollouts — reference model bookkeeping included."""
+"""dpo when you can't afford online rollouts — reference model bookkeeping included."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ class DPOConfig:
 
 
 class DPOPipeline:
-    """Reference policy frozen; policy trains with implicit preference signal."""
+    """reference policy frozen; policy trains with implicit preference signal."""
 
     def __init__(
         self,
@@ -68,11 +68,11 @@ class DPOPipeline:
         return -F.logsigmoid(logits).mean()
 
     def implicit_reward_stats(self, chosen_logps: torch.Tensor, ref_chosen: torch.Tensor) -> float:
-        """Rough DPO implicit reward — mostly for dashboards."""
+        """rough dpo implicit reward — mostly for dashboards."""
         return float((chosen_logps - ref_chosen).mean().detach().item())
 
     def maybe_refresh_reference(self) -> None:
-        """If you want periodic ref sync (unusual for vanilla DPO), wire steps here."""
+        """if you want periodic ref sync (unusual for vanilla dpo), wire steps here."""
         if self.config.reference_sync_every <= 0:
             return
         if self._step > 0 and self._step % self.config.reference_sync_every == 0:
@@ -96,7 +96,7 @@ class DPOPipeline:
             ref_out["rejected_logps"],
         )
         if not math.isfinite(loss.detach().item()):
-            raise FloatingPointError("DPO loss blew up — lower beta or check logprobs")
+            raise FloatingPointError("dpo loss blew up — lower beta or check logprobs")
 
         ir = self.implicit_reward_stats(pol_out["chosen_logps"], ref_out["chosen_logps"])
         self._implicit_rewards.append(ir)
