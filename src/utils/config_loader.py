@@ -1,29 +1,31 @@
 import json
 import os
-from typing import Any, Dict
 
 class ConfigLoader:
-    def __init__(self, config_path: str):
-        self.config_path = config_path
-        self.config_data: Dict[str, Any] = {}
+    def __init__(self, config_file: str):
+        self.config_file = config_file
+        self.config_data = {}
+        self.load_config()
 
-    def load(self) -> Dict[str, Any]:
-        if not os.path.exists(self.config_path):
-            raise FileNotFoundError(f"Config file not found at {self.config_path}")
-        
-        with open(self.config_path, 'r') as file:
+    def load_config(self) -> None:
+        if not os.path.exists(self.config_file):
+            raise FileNotFoundError(f'Config file not found: {self.config_file}')
+        with open(self.config_file, 'r') as file:
             self.config_data = json.load(file)
-        
-        return self.config_data
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default=None):
         return self.config_data.get(key, default)
 
-# usage example
-if __name__ == "__main__":
-    config_loader = ConfigLoader("config.json")  # TODO: update with your config path
-    try:
-        config = config_loader.load()
-        print(f"Loaded config: {config}")
-    except Exception as e:
-        print(f"Error loading config: {e}")
+    def set(self, key: str, value) -> None:
+        self.config_data[key] = value
+        self.save_config()
+
+    def save_config(self) -> None:
+        with open(self.config_file, 'w') as file:
+            json.dump(self.config_data, file, indent=4)
+
+# example usage
+if __name__ == '__main__':
+    config_loader = ConfigLoader('config.json')
+    print(config_loader.get('some_setting', 'default_value'))  # TODO: replace with actual key
+    config_loader.set('new_setting', 'new_value')  # TODO: update for actual usage
