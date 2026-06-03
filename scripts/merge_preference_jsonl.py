@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, Iterator, Tuple
 
 
 def stable_key(obj: Dict[str, Any]) -> str:
+    # create a stable key for deduplication based on prompt and answers
     base = json.dumps(
         {"p": obj.get("prompt"), "a": obj.get("a"), "b": obj.get("b")},
         sort_keys=True,
@@ -17,26 +18,35 @@ def stable_key(obj: Dict[str, Any]) -> str:
 
 
 def iter_jsonl(path: Path) -> Iterator[Dict[str, Any]]:
+    # iterate over jsonl file and yield each json object
     with path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
-            yield json.loads(line)
+            try:
+                yield json.loads(line)
+            except json.JSONDecodeError as e:
+                print(f"error decoding JSON from {path}: {e}")
 
 
 def merge(paths: Iterable[Path]) -> Iterator[Tuple[str, Dict[str, Any]]]:
+    # merge multiple jsonl files, yielding unique objects
     seen: Dict[str, Dict[str, Any]] = {}
     for p in paths:
-        for obj in iter_jsonl(p):
-            k = stable_key(obj)
-            if k in seen:
-                continue
-            seen[k] = obj
-            yield k, obj
+        try:
+            for obj in iter_jsonl(p):
+                k = stable_key(obj)
+                if k in seen:
+                    continue
+                seen[k] = obj
+                yield k, obj
+        except Exception as e:
+            print(f"error processing {p}: {e}")
 
 
 def write_merged(out: Path, paths: Iterable[Path]) -> int:
+    # write merged jsonl data to output file
     n = 0
     with out.open("w", encoding="utf-8") as f:
         for _, obj in merge(paths):
