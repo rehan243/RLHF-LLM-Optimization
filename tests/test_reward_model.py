@@ -1,31 +1,39 @@
 import pytest
-from reward_model import calculate_reward, normalize_scores  # assuming these exist
+from reward_model import RewardModel
 
-def test_calculate_reward():
-    # testing with some example inputs
-    preferences = [1, 0, 1, 1, 0]
-    rewards = calculate_reward(preferences)
-    
-    # check if the output is as expected
-    assert len(rewards) == len(preferences)
-    assert all(r in [0, 1] for r in rewards)  # rewards should be binary
+# test that the reward model gives expected outputs for known inputs
+def test_reward_model_prediction():
+    model = RewardModel()
 
-def test_normalize_scores():
-    # testing normalization of scores
-    scores = [1.0, 2.0, 3.0, 4.0]
-    normalized = normalize_scores(scores)
-    
-    # check if scores are between 0 and 1
-    assert all(0 <= n <= 1 for n in normalized)
-    
-    # check if sum of normalized scores is 1
-    assert abs(sum(normalized) - 1.0) < 1e-6  # floating point precision
+    # let's assume we have some known inputs and expected outputs
+    known_inputs = [
+        "I really enjoyed this movie",
+        "This was the worst experience ever",
+        "The plot was okay, could be better"
+    ]
 
-def test_empty_preferences():
-    # testing with empty preferences
-    preferences = []
-    rewards = calculate_reward(preferences)
-    
-    assert rewards == []  # should return an empty list
+    expected_outputs = [
+        0.9,  # expected reward for positive sentiment
+        0.1,  # expected reward for negative sentiment
+        0.5   # expected reward for neutral sentiment
+    ]
 
-# TODO: add more tests for edge cases and larger inputs if needed
+    for input_text, expected in zip(known_inputs, expected_outputs):
+        prediction = model.predict(input_text)
+        assert abs(prediction - expected) < 0.05, f"failed for input: {input_text}"
+
+# test the model's behavior with unexpected input
+def test_reward_model_unexpected_input():
+    model = RewardModel()
+    unexpected_input = None
+
+    with pytest.raises(TypeError):
+        model.predict(unexpected_input)
+
+# test if the model handles empty string input
+def test_reward_model_empty_input():
+    model = RewardModel()
+    prediction = model.predict("")
+    assert prediction == 0.5, "expected output should be 0.5 for empty input"
+
+# TODO: add more tests for edge cases and different input types
