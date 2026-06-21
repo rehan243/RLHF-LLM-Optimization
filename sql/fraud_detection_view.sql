@@ -1,29 +1,24 @@
-create or replace view fraud_detection_view as
+create or replace view potential_fraud_detection as
 select 
-    t.transaction_id,
-    t.user_id,
-    t.amount,
-    t.transaction_date,
-    u.account_age,
+    transactions.user_id,
+    transactions.transaction_id,
+    transactions.amount,
+    transactions.timestamp,
+    users.account_age,
     case 
-        when t.amount > 1000 then 'high_value'
-        when t.amount between 500 and 1000 then 'medium_value'
+        when transactions.amount > 1000 then 'high_value'
+        when transactions.amount between 500 and 1000 then 'medium_value'
         else 'low_value'
-    end as transaction_value,
-    case 
-        when t.amount > 1000 and u.account_age < 30 then 'potential_fraud'
-        when t.amount > 500 and u.account_age < 60 then 'review'
-        else 'normal'
-    end as fraud_risk
+    end as transaction_value_category,
+    count(transactions.transaction_id) over (partition by transactions.user_id order by transactions.timestamp range between interval '30 days' preceding and current row) as recent_transaction_count
 from 
-    transactions t
+    transactions
 join 
-    users u on t.user_id = u.user_id
+    users on transactions.user_id = users.id
 where 
-    t.transaction_date >= current_date - interval '30 days'
-    and t.transaction_status = 'completed'
-order by 
-    t.transaction_date desc;
+    transactions.status = 'completed'
+    and transactions.timestamp >= current_date - interval '90 days'
+    and users.is_active = true;
 
--- TODO: consider indexing on transaction_date for better performance
--- this view aims to help in identifying potentially fraudulent activities based on transaction patterns
+-- TODO: might want to add more user attributes later for better insights
+-- also consider indexing on user_id and timestamp for performance
