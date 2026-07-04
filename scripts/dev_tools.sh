@@ -1,41 +1,67 @@
 #!/bin/bash
 
-# check for required tools
-if ! command -v flake8 &> /dev/null
-then
-    echo "flake8 could not be found, install it to continue"
-    exit
-fi
+# script for development tools like linting and testing
+set -e  # exit immediately if a command exits with a non-zero status
 
-if ! command -v pytest &> /dev/null
-then
-    echo "pytest could not be found, install it to continue"
-    exit
-fi
+# function to lint the Python files
+lint() {
+    echo "running linter..."
+    flake8 src/  # check for style guide enforcement
+    echo "linting complete"
+}
 
-# run flake8 for linting
-echo "running flake8 for linting"
-flake8 src/
+# function to run tests
+test() {
+    echo "running tests..."
+    pytest tests/  # execute tests in the tests directory
+    echo "testing complete"
+}
 
-# if linting fails, exit early
-if [ $? -ne 0 ]; then
-    echo "linting failed, please fix issues"
+# function to build and run docker container
+docker_run() {
+    echo "building and running docker container..."
+    docker build -t rlhf_llm_opt .  # build the image
+    docker run --rm -it rlhf_llm_opt  # run the container
+    echo "docker run complete"
+}
+
+# help message
+help() {
+    echo "dev_tools.sh - development tools for RLHF-LLM-Optimization"
+    echo "Usage: ./dev_tools.sh [command]"
+    echo "Commands:"
+    echo "  lint        run the linter"
+    echo "  test        run the tests"
+    echo "  docker      build and run the docker container"
+    echo "  help        show this help message"
+}
+
+# check for command arguments
+if [ $# -eq 0 ]; then
+    echo "no command provided, showing help"
+    help
     exit 1
 fi
 
-echo "linting passed"
+# main switch case
+case $1 in
+    lint)
+        lint
+        ;;
+    test)
+        test
+        ;;
+    docker)
+        docker_run
+        ;;
+    help)
+        help
+        ;;
+    *)
+        echo "unknown command: $1"
+        help
+        exit 1
+        ;;
+esac
 
-# run tests
-echo "running tests with pytest"
-pytest tests/
-
-# if tests fail, notify user
-if [ $? -ne 0 ]; then
-    echo "tests failed, check the output above"
-    exit 1
-fi
-
-echo "all tests passed"
-
-# TODO: add docker build and run commands if needed in the future
-echo "you can now continue with your development"
+# TODO: consider adding more dev tools in the future
