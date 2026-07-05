@@ -1,67 +1,55 @@
 #!/bin/bash
 
-# script for development tools like linting and testing
-set -e  # exit immediately if a command exits with a non-zero status
+# this script will help with linting and testing the codebase
 
-# function to lint the Python files
-lint() {
+set -e # exit immediately if a command exits with a non-zero status
+
+# function to run linting
+run_lint() {
     echo "running linter..."
-    flake8 src/  # check for style guide enforcement
-    echo "linting complete"
+    flake8 src/ # checking for PEP 8 compliance
+    echo "linting completed"
 }
 
 # function to run tests
-test() {
+run_tests() {
     echo "running tests..."
-    pytest tests/  # execute tests in the tests directory
-    echo "testing complete"
+    pytest tests/ # running all tests in the tests directory
+    echo "all tests passed"
 }
 
-# function to build and run docker container
-docker_run() {
-    echo "building and running docker container..."
-    docker build -t rlhf_llm_opt .  # build the image
-    docker run --rm -it rlhf_llm_opt  # run the container
-    echo "docker run complete"
+# function to build docker image
+build_docker() {
+    echo "building docker image..."
+    docker build -t rlhf-llm-optimization . # change the image name as needed
+    echo "docker image built successfully"
 }
 
-# help message
-help() {
-    echo "dev_tools.sh - development tools for RLHF-LLM-Optimization"
-    echo "Usage: ./dev_tools.sh [command]"
-    echo "Commands:"
-    echo "  lint        run the linter"
-    echo "  test        run the tests"
-    echo "  docker      build and run the docker container"
-    echo "  help        show this help message"
+# function to run the application locally
+run_local() {
+    echo "running the application locally..."
+    python src/main.py # replace with the actual entry point
+    echo "application is now running"
 }
 
-# check for command arguments
-if [ $# -eq 0 ]; then
-    echo "no command provided, showing help"
-    help
-    exit 1
-fi
-
-# main switch case
-case $1 in
+# main script logic
+case "$1" in
     lint)
-        lint
+        run_lint
         ;;
     test)
-        test
+        run_tests
         ;;
-    docker)
-        docker_run
+    build)
+        build_docker
         ;;
-    help)
-        help
+    run)
+        run_local
         ;;
     *)
-        echo "unknown command: $1"
-        help
+        echo "usage: $0 {lint|test|build|run}" # show usage when called with no arguments
         exit 1
         ;;
 esac
 
-# TODO: consider adding more dev tools in the future
+# TODO: add more functionalities as needed
