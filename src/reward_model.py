@@ -23,10 +23,7 @@ class PreferenceBatch:
     rejected_attention_mask: torch.Tensor
 
 
-def _pool_last_hidden(
-    hidden: torch.Tensor,
-    attention_mask: torch.Tensor,
-) -> torch.Tensor:
+def _pool_last_hidden(hidden: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
     """pool last hidden states based on attention mask"""
     mask = attention_mask.unsqueeze(-1)
     summed = (hidden * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1e-6)
