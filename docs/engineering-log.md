@@ -14,3 +14,7 @@ During training with PPO for preference optimization, I noticed that overly aggr
 - **Reward Modeling**: I've been using a simple reward model based on task completion and accuracy. However, I noticed that the model tends to prioritize task completion over accuracy, which can lead to suboptimal responses. I've been experimenting with adding a penalty for incorrect responses to better balance the two.
 
 - **Tradeoff**: The main tradeoff I've noticed is between diversity and coherence. DPO helps maintain diversity but can sometimes lead to less coherent responses, while PPO tends to produce more coherent responses but can be less
+
+### 2026-07-12
+
+**Observation:** I found that using a larger reward scale (up to 100) for DPO/PPO resulted in better convergence and more stable training. However, it also increased the risk of overfitting, so I had to carefully tune the learning rate and batch size to maintain generalization.
