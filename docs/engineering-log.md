@@ -18,3 +18,7 @@ During training with PPO for preference optimization, I noticed that overly aggr
 ### 2026-07-12
 
 **Observation:** I found that using a larger reward scale (up to 100) for DPO/PPO resulted in better convergence and more stable training. However, it also increased the risk of overfitting, so I had to carefully tune the learning rate and batch size to maintain generalization.
+
+### 2026-07-16
+
+Tried training a reward model with preference data using DPO and PPO; found PPO's sampling variance makes reward signals noisier, slowing convergence compared to DPO's direct policy updates. Also, tuning the KL penalty coefficient is critical, too low leads to policy collapse, too high stalls learning. For reward modeling, balancing dataset size with annotation quality remains a key bottleneck.
