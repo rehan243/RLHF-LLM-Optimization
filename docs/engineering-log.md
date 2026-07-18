@@ -22,3 +22,7 @@ During training with PPO for preference optimization, I noticed that overly aggr
 ### 2026-07-16
 
 Tried training a reward model with preference data using DPO and PPO; found PPO's sampling variance makes reward signals noisier, slowing convergence compared to DPO's direct policy updates. Also, tuning the KL penalty coefficient is critical, too low leads to policy collapse, too high stalls learning. For reward modeling, balancing dataset size with annotation quality remains a key bottleneck.
+
+### 2026-07-18
+
+Tested DPO on a small reward model and noticed that tuning the KL coefficient too low causes rapid policy collapse, while too high slows learning drastically. PPO remains more stable under noisy reward signals but requires careful clipping parameter adjustments to avoid overfitting to preference data. Reward modeling quality heavily impacts convergence, so investing in accurate preference annotation upfront pays off in training stability.
