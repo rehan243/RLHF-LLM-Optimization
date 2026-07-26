@@ -26,3 +26,7 @@ Tried training a reward model with preference data using DPO and PPO; found PPO'
 ### 2026-07-18
 
 Tested DPO on a small reward model and noticed that tuning the KL coefficient too low causes rapid policy collapse, while too high slows learning drastically. PPO remains more stable under noisy reward signals but requires careful clipping parameter adjustments to avoid overfitting to preference data. Reward modeling quality heavily impacts convergence, so investing in accurate preference annotation upfront pays off in training stability.
+
+### 2026-07-26
+
+Discovered that tuning the clipping parameter in PPO significantly impacts training stability; too high causes policy divergence, while too low limits exploration. For preference optimization, balancing reward signal sparsity with entropy regularization proved critical, over-regularizing dampens policy updates, but under-regularizing leads to noisy gradients.
