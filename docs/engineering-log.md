@@ -30,3 +30,7 @@ Tested DPO on a small reward model and noticed that tuning the KL coefficient to
 ### 2026-07-26
 
 Discovered that tuning the clipping parameter in PPO significantly impacts training stability; too high causes policy divergence, while too low limits exploration. For preference optimization, balancing reward signal sparsity with entropy regularization proved critical, over-regularizing dampens policy updates, but under-regularizing leads to noisy gradients.
+
+### 2026-07-27
+
+Tried both DPO and PPO for preference optimization on the same reward model; DPO converges faster with less tuning but struggles with longer horizon tasks where PPO's iterative policy updates handle delayed credit assignment better. Noticed reward modeling quality significantly impacts stability, noisy preference labels lead to unstable PPO gradients, while DPO's direct optimization is somewhat more robust but less flexible for complex policies.
