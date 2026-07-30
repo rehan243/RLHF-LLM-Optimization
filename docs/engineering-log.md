@@ -34,3 +34,7 @@ Discovered that tuning the clipping parameter in PPO significantly impacts train
 ### 2026-07-27
 
 Tried both DPO and PPO for preference optimization on the same reward model; DPO converges faster with less tuning but struggles with longer horizon tasks where PPO's iterative policy updates handle delayed credit assignment better. Noticed reward modeling quality significantly impacts stability, noisy preference labels lead to unstable PPO gradients, while DPO's direct optimization is somewhat more robust but less flexible for complex policies.
+
+### 2026-07-30
+
+Noticed that tuning the clipping parameter in PPO significantly affects stability, setting it too high causes policy updates to become unstable, while too low slows down learning; a moderate value around 0.2 seems to balance learning speed and stability. Also, during reward modeling, I observed that overfitting to the reward signal can lead to degenerate policies, so incorporating a small amount of regularization or early stopping based on validation performance helps.
