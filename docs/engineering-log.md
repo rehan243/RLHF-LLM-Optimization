@@ -38,3 +38,7 @@ Tried both DPO and PPO for preference optimization on the same reward model; DPO
 ### 2026-07-30
 
 Noticed that tuning the clipping parameter in PPO significantly affects stability, setting it too high causes policy updates to become unstable, while too low slows down learning; a moderate value around 0.2 seems to balance learning speed and stability. Also, during reward modeling, I observed that overfitting to the reward signal can lead to degenerate policies, so incorporating a small amount of regularization or early stopping based on validation performance helps.
+
+### 2026-08-01
+
+Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced that measuring the change end-to-end beats reasoning about it in isolation — the numbers rarely match the intuition.
