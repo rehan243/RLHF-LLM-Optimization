@@ -42,3 +42,7 @@ Noticed that tuning the clipping parameter in PPO significantly affects stabilit
 ### 2026-08-01
 
 Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced that measuring the change end-to-end beats reasoning about it in isolation — the numbers rarely match the intuition.
+
+### 2026-08-04
+
+Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced that measuring the change end-to-end beats reasoning about it in isolation — the numbers rarely match the intuition.
