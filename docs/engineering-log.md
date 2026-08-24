@@ -70,3 +70,7 @@ Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced
 ### 2026-08-22
 
 Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced that measuring the change end-to-end beats reasoning about it in isolation — the numbers rarely match the intuition.
+
+### 2026-08-24
+
+Reviewed preference optimization (DPO/PPO) and reward modeling today. Reinforced that measuring the change end-to-end beats reasoning about it in isolation — the numbers rarely match the intuition.
